@@ -26,6 +26,12 @@ export function readSongText(relativePath: string): string {
   return readFileSync(join(getDataDir(), relativePath), 'utf-8')
 }
 
+export function readSongBinary(relativePath: string): Uint8Array {
+  // Copy out of Node's Buffer (which may be a view into a pooled ArrayBuffer) so what
+  // crosses the IPC bridge is an exact, independently-sized backing buffer.
+  return new Uint8Array(readFileSync(join(getDataDir(), relativePath)))
+}
+
 export function importSong(input: ImportSongInput): Song {
   const id = randomUUID()
   const songDir = getSongDir(id)

@@ -76,7 +76,8 @@ The renderer never touches the filesystem directly — every read/write goes thr
 ## Features
 
 **Song library** — add songs with title, artist, key, tempo, notes; audio (MP3/WAV/FLAC) and
-lyrics (plain text or Markdown source) files are copied in on import. Search, edit, delete.
+lyrics (plain text, Markdown source, or CD+G `.cdg` karaoke graphics) files are copied in on
+import. Search, edit, delete.
 
 **Setlists** — create/rename/delete setlists, add songs from the library, reorder with
 up/down controls, remove.
@@ -90,6 +91,8 @@ up/down controls, remove.
 - Display sleep is blocked for the duration of the performance (`powerSaveBlocker`)
 - A missing/unreadable audio or lyrics file shows a clear on-screen error instead of failing
   silently or crashing
+- `.cdg` karaoke files render as a synced canvas overlay (via [cdgraphics](https://github.com/bhj/cdgraphics)),
+  driven directly off the audio element's `currentTime`
 
 **Reliability hardening**:
 - Crash-safe resume — the current setlist + song index is persisted continuously while

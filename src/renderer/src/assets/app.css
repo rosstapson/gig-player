@@ -486,6 +486,15 @@
   font-size: 1.2rem;
 }
 
+.cdg-canvas {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  aspect-ratio: 300 / 216;
+  background: #000;
+}
+
 .performance-transport {
   flex-shrink: 0;
   display: flex;

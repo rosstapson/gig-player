@@ -1,5 +1,6 @@
 import type { Song } from '@shared/types'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { CdgLyricsView } from '../../components/CdgLyricsView'
 import { toFileUrl } from '../../lib/fileUrl'
 import { useLibraryStore } from '../../state/libraryStore'
 import { useSetlistStore } from '../../state/setlistStore'
@@ -36,6 +37,7 @@ export function PerformanceView({
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0) // 0-1
   const [lyricsText, setLyricsText] = useState<string | null>(null)
+  const [cdgData, setCdgData] = useState<ArrayBuffer | null>(null)
   const [lyricsError, setLyricsError] = useState<string | null>(null)
   const [audioError, setAudioError] = useState<string | null>(null)
   const [armed, setArmed] = useState<ArmedSkip | null>(null)
@@ -72,6 +74,7 @@ export function PerformanceView({
     setIsPlaying(false)
     setProgress(0)
     setLyricsText(null)
+    setCdgData(null)
     setLyricsError(null)
     setAudioError(null)
     if (lyricsRef.current) lyricsRef.current.scrollTop = 0
@@ -90,7 +93,21 @@ export function PerformanceView({
         if (!cancelled) setAudioError(err instanceof Error ? err.message : String(err))
       })
 
-    if (currentSong.lyricsFile) {
+    if (currentSong.lyricsFile && currentSong.lyricsFormat === 'cdg') {
+      window.api.library
+        .readBinary(currentSong.lyricsFile)
+        .then((bytes) => {
+          if (!cancelled) {
+            // .buffer is typed as ArrayBufferLike (could theoretically be a SharedArrayBuffer),
+            // but IPC-delivered bytes never actually are one — this slice is always a plain ArrayBuffer.
+            const buf = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
+            setCdgData(buf as ArrayBuffer)
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setLyricsError('CD+G file is missing or unreadable.')
+        })
+    } else if (currentSong.lyricsFile) {
       window.api.library
         .readText(currentSong.lyricsFile)
         .then((text) => {
@@ -251,6 +268,8 @@ export function PerformanceView({
       <div className="performance-lyrics" ref={lyricsRef}>
         {lyricsError ? (
           <p className="performance-no-lyrics performance-error-text">{lyricsError}</p>
+        ) : cdgData ? (
+          <CdgLyricsView data={cdgData} audioRef={audioRef} />
         ) : lyricsText ? (
           <pre>{lyricsText}</pre>
         ) : (

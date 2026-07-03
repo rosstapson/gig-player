@@ -1,4 +1,4 @@
-export type LyricsFormat = 'text' | 'markdown' | 'lrc'
+export type LyricsFormat = 'text' | 'markdown' | 'lrc' | 'cdg'
 
 export interface Song {
   id: string

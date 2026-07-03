@@ -19,7 +19,7 @@ export function registerLibraryIpc(): void {
     const result = await dialog.showOpenDialog({
       title: 'Choose a lyrics file',
       properties: ['openFile'],
-      filters: [{ name: 'Lyrics', extensions: ['txt', 'md', 'lrc'] }]
+      filters: [{ name: 'Lyrics', extensions: ['txt', 'md', 'lrc', 'cdg'] }]
     })
     return result.canceled ? null : result.filePaths[0]
   })
@@ -40,5 +40,9 @@ export function registerLibraryIpc(): void {
 
   ipcMain.handle(IPC.library.readText, (_event, relativePath: string) =>
     library.readSongText(relativePath)
+  )
+
+  ipcMain.handle(IPC.library.readBinary, (_event, relativePath: string) =>
+    library.readSongBinary(relativePath)
   )
 }

@@ -26,6 +26,8 @@ export interface GigPlayerAPI {
     resolvePath(relativePath: string): Promise<string>
     /** Reads a lyrics file's contents as utf-8 text. */
     readText(relativePath: string): Promise<string>
+    /** Reads a lyrics file's raw bytes — used for binary formats like .cdg. */
+    readBinary(relativePath: string): Promise<Uint8Array>
   }
   setlists: {
     list(): Promise<Setlist[]>

@@ -7,7 +7,8 @@ export const IPC = {
     updateSong: 'library:updateSong',
     deleteSong: 'library:deleteSong',
     resolvePath: 'library:resolvePath',
-    readText: 'library:readText'
+    readText: 'library:readText',
+    readBinary: 'library:readBinary'
   },
   setlists: {
     list: 'setlists:list',

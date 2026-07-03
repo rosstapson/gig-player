@@ -45,7 +45,13 @@ export function SongForm({ mode, initial, onCancel, onSubmit }: SongFormProps): 
 
   async function handlePickLyrics(): Promise<void> {
     const path = await window.api.library.pickLyricsFile()
-    if (path) setLyricsPath(path)
+    if (!path) return
+    setLyricsPath(path)
+    const ext = path.split('.').pop()?.toLowerCase()
+    if (ext === 'cdg') setLyricsFormat('cdg')
+    else if (ext === 'lrc') setLyricsFormat('lrc')
+    else if (ext === 'md') setLyricsFormat('markdown')
+    else if (ext === 'txt') setLyricsFormat('text')
   }
 
   async function handleSubmit(e: React.FormEvent): Promise<void> {
@@ -131,6 +137,7 @@ export function SongForm({ mode, initial, onCancel, onSubmit }: SongFormProps): 
             <option value="text">Plain text</option>
             <option value="markdown">Markdown</option>
             <option value="lrc">Timed (.lrc)</option>
+            <option value="cdg">CD+G (.cdg)</option>
           </select>
         </label>
 

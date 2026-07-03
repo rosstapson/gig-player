@@ -15,7 +15,8 @@ const api = {
     deleteSong: (id: string) => ipcRenderer.invoke(IPC.library.deleteSong, id),
     resolvePath: (relativePath: string) =>
       ipcRenderer.invoke(IPC.library.resolvePath, relativePath),
-    readText: (relativePath: string) => ipcRenderer.invoke(IPC.library.readText, relativePath)
+    readText: (relativePath: string) => ipcRenderer.invoke(IPC.library.readText, relativePath),
+    readBinary: (relativePath: string) => ipcRenderer.invoke(IPC.library.readBinary, relativePath)
   },
   setlists: {
     list: () => ipcRenderer.invoke(IPC.setlists.list),
