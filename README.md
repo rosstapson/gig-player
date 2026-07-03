@@ -123,4 +123,4 @@ practice-oriented Rehearsal Mode (seek/loop/tempo/key changes), and library back
 
 ## License
 
-Not yet decided.
+[MIT](LICENSE)
