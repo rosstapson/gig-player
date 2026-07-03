@@ -1,7 +1,7 @@
 import type { Song } from '@shared/types'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CdgLyricsView } from '../../components/CdgLyricsView'
-import { toFileUrl } from '../../lib/fileUrl'
+import { toMediaUrl } from '../../lib/fileUrl'
 import { useLibraryStore } from '../../state/libraryStore'
 import { useSetlistStore } from '../../state/setlistStore'
 
@@ -82,16 +82,10 @@ export function PerformanceView({
     if (!currentSong) return
     let cancelled = false
 
-    window.api.library
-      .resolvePath(currentSong.audioFile)
-      .then((absPath) => {
-        if (cancelled || !audioRef.current) return
-        audioRef.current.src = toFileUrl(absPath)
-        audioRef.current.load()
-      })
-      .catch((err) => {
-        if (!cancelled) setAudioError(err instanceof Error ? err.message : String(err))
-      })
+    if (audioRef.current) {
+      audioRef.current.src = toMediaUrl(currentSong.audioFile)
+      audioRef.current.load()
+    }
 
     if (currentSong.lyricsFile && currentSong.lyricsFormat === 'cdg') {
       window.api.library

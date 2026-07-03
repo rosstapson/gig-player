@@ -7,7 +7,11 @@ import { registerLibraryIpc } from './ipc/library'
 import { registerPerformanceIpc } from './ipc/performance'
 import { registerSetlistsIpc } from './ipc/setlists'
 import { listSongs } from './lib/library'
+import { registerMediaProtocolHandler, registerMediaProtocolScheme } from './lib/mediaProtocol'
 import { listSetlists } from './lib/setlists'
+
+// Must happen before app.whenReady() — Electron only accepts scheme privileges up to that point.
+registerMediaProtocolScheme()
 
 let mainWindow: BrowserWindow | null = null
 
@@ -68,6 +72,7 @@ app.whenReady().then(() => {
   registerSetlistsIpc()
   registerPerformanceIpc(() => mainWindow)
   registerDiagnosticsIpc()
+  registerMediaProtocolHandler()
 
   // Read once up front so any corrupted file is detected before the renderer asks for warnings.
   listSongs()
