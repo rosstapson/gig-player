@@ -1,0 +1,44 @@
+import type { NewSong, Setlist, Song } from './types'
+
+/** Everything needed to import a song: metadata plus absolute source paths picked via native dialogs. */
+export interface ImportSongInput extends Omit<NewSong, 'audioFile' | 'lyricsFile'> {
+  sourceAudioPath: string
+  sourceLyricsPath: string | null
+}
+
+export type SongPatch = Partial<Omit<NewSong, 'audioFile' | 'lyricsFile'>>
+
+/**
+ * The renderer-facing API exposed via preload's contextBridge.
+ * Renderer code only ever calls window.api.* — it never touches the filesystem directly.
+ */
+export interface GigPlayerAPI {
+  library: {
+    list(): Promise<Song[]>
+    /** Opens a native file picker, returns the absolute path or null if cancelled. */
+    pickAudioFile(): Promise<string | null>
+    pickLyricsFile(): Promise<string | null>
+    /** Copies the source files into the managed data dir and adds a library entry. */
+    importSong(input: ImportSongInput): Promise<Song>
+    updateSong(id: string, patch: SongPatch): Promise<Song>
+    deleteSong(id: string): Promise<void>
+    /** Resolves a song's audioFile/lyricsFile to an absolute path for playback/display. */
+    resolvePath(relativePath: string): Promise<string>
+    /** Reads a lyrics file's contents as utf-8 text. */
+    readText(relativePath: string): Promise<string>
+  }
+  setlists: {
+    list(): Promise<Setlist[]>
+    create(name: string): Promise<Setlist>
+    rename(id: string, name: string): Promise<Setlist>
+    delete(id: string): Promise<void>
+    /** Replaces the full ordered song id list — used for add/remove/reorder alike. */
+    setSongIds(id: string, songIds: string[]): Promise<Setlist>
+  }
+  performance: {
+    /** Enters fullscreen and blocks display sleep for the duration of the performance. */
+    start(): Promise<void>
+    /** Exits fullscreen and releases the sleep block. */
+    stop(): Promise<void>
+  }
+}
