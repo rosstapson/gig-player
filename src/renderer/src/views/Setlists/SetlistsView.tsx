@@ -5,7 +5,7 @@ import { useSetlistStore } from '../../state/setlistStore'
 import { SetlistDetail } from './SetlistDetail'
 
 interface SetlistsViewProps {
-  onStartPerformance: (setlistId: string) => void
+  onStartPerformance: (setlistId: string, startIndex?: number) => void
 }
 
 export function SetlistsView({ onStartPerformance }: SetlistsViewProps): React.JSX.Element {

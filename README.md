@@ -77,10 +77,10 @@ The renderer never touches the filesystem directly — every read/write goes thr
 
 **Song library** — add songs with title, artist, key, tempo, notes; audio (MP3/WAV/FLAC) and
 lyrics (plain text, Markdown source, or CD+G `.cdg` karaoke graphics) files are copied in on
-import. Search, edit, delete.
+import. Search, edit, delete. Double-click a song to play it standalone in Performance Mode.
 
 **Setlists** — create/rename/delete setlists, add songs from the library, reorder with
-up/down controls, remove.
+up/down controls, remove. Double-click a song in a setlist to start performing from there.
 
 **Performance Mode** — fullscreen, pure-black stage view:
 - Large centered lyrics; current song title and the next song both visible

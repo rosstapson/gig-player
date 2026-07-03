@@ -5,7 +5,7 @@ import { useSetlistStore } from '../../state/setlistStore'
 
 interface SetlistDetailProps {
   setlist: Setlist
-  onStartPerformance: (setlistId: string) => void
+  onStartPerformance: (setlistId: string, startIndex?: number) => void
 }
 
 export function SetlistDetail({
@@ -89,14 +89,19 @@ export function SetlistDetail({
       {setlistSongs.length > 0 && (
         <ol className="setlist-songs">
           {setlistSongs.map((song, index) => (
-            <li key={song.id} className="setlist-song-row">
+            <li
+              key={song.id}
+              className="setlist-song-row"
+              onDoubleClick={() => onStartPerformance(setlist.id, index)}
+              title="Double-click to perform from here"
+            >
               <span className="setlist-song-position mono">{index + 1}</span>
               <div className="setlist-song-info">
                 <span className="song-title">{song.title}</span>
                 <span className="muted"> — {song.artist}</span>
               </div>
               <span className="mono setlist-song-key">{song.key}</span>
-              <div className="setlist-song-actions">
+              <div className="setlist-song-actions" onDoubleClick={(e) => e.stopPropagation()}>
                 <button
                   className="btn-link"
                   disabled={index === 0}

@@ -5,8 +5,9 @@ import { toMediaUrl } from '../../lib/fileUrl'
 import { useLibraryStore } from '../../state/libraryStore'
 import { useSetlistStore } from '../../state/setlistStore'
 
-interface PerformanceViewProps {
-  setlistId: string
+type PerformanceSource = { setlistId: string } | { songs: Song[] }
+
+type PerformanceViewProps = PerformanceSource & {
   startIndex?: number
   onExit: () => void
 }
@@ -18,21 +19,24 @@ interface ArmedSkip {
 
 const ARM_TIMEOUT_MS = 1500
 
-export function PerformanceView({
-  setlistId,
-  startIndex = 0,
-  onExit
-}: PerformanceViewProps): React.JSX.Element {
-  const { songs } = useLibraryStore()
-  const setlist = useSetlistStore((state) => state.setlists.find((s) => s.id === setlistId))
+export function PerformanceView(props: PerformanceViewProps): React.JSX.Element {
+  const { startIndex = 0, onExit } = props
+  const setlistId = 'setlistId' in props ? props.setlistId : null
+  const ephemeralSongs = 'songs' in props ? props.songs : null
+
+  const { songs: librarySongs } = useLibraryStore()
+  const setlist = useSetlistStore((state) =>
+    setlistId ? state.setlists.find((s) => s.id === setlistId) : undefined
+  )
   const songIds = useMemo(() => setlist?.songIds ?? [], [setlist])
   const orderedSongs = useMemo(() => {
-    const byId = new Map(songs.map((s) => [s.id, s]))
+    if (ephemeralSongs) return ephemeralSongs
+    const byId = new Map(librarySongs.map((s) => [s.id, s]))
     return songIds.map((id) => byId.get(id)).filter((s): s is Song => s !== undefined)
-  }, [songs, songIds])
+  }, [ephemeralSongs, librarySongs, songIds])
 
   const [currentIndex, setCurrentIndex] = useState(
-    startIndex >= 0 && startIndex < songIds.length ? startIndex : 0
+    startIndex >= 0 && startIndex < orderedSongs.length ? startIndex : 0
   )
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0) // 0-1
@@ -59,8 +63,10 @@ export function PerformanceView({
 
   // Persist where we are on every song change, so a crash can offer to resume here.
   // A clean exit (handleExit) clears this — a leftover state on next launch means we didn't.
+  // Skipped for an ephemeral single-song preview (no setlistId) — there's nothing durable to
+  // resume into, so we deliberately leave no trace on disk for a quick library preview.
   useEffect(() => {
-    if (!currentSong) return
+    if (!currentSong || !setlistId) return
     window.api.performance.saveState({
       setlistId,
       songIndex: currentIndex,
@@ -211,7 +217,7 @@ export function PerformanceView({
   if (!currentSong) {
     return (
       <div className="performance-view performance-empty">
-        <p>This setlist has no songs.</p>
+        <p>{setlistId ? 'This setlist has no songs.' : 'No song to play.'}</p>
         <button className="btn-secondary" onClick={onExit}>
           Exit
         </button>

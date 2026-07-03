@@ -1,4 +1,4 @@
-import type { PerformanceState } from '@shared/types'
+import type { PerformanceState, Song } from '@shared/types'
 import { useEffect, useState } from 'react'
 import { useLibraryStore } from './state/libraryStore'
 import { useSetlistStore } from './state/setlistStore'
@@ -8,10 +8,7 @@ import { SetlistsView } from './views/Setlists/SetlistsView'
 
 type Tab = 'library' | 'setlists'
 
-interface ActivePerformance {
-  setlistId: string
-  startIndex: number
-}
+type ActivePerformance = ({ setlistId: string } | { songs: Song[] }) & { startIndex: number }
 
 function App(): React.JSX.Element {
   const [tab, setTab] = useState<Tab>('library')
@@ -61,7 +58,9 @@ function App(): React.JSX.Element {
   if (performance) {
     return (
       <PerformanceView
-        setlistId={performance.setlistId}
+        {...('setlistId' in performance
+          ? { setlistId: performance.setlistId }
+          : { songs: performance.songs })}
         startIndex={performance.startIndex}
         onExit={() => setPerformance(null)}
       />
@@ -94,9 +93,15 @@ function App(): React.JSX.Element {
       )}
 
       <main className="app-body">
-        {tab === 'library' && <LibraryView />}
+        {tab === 'library' && (
+          <LibraryView onPlaySong={(song) => setPerformance({ songs: [song], startIndex: 0 })} />
+        )}
         {tab === 'setlists' && (
-          <SetlistsView onStartPerformance={(setlistId) => setPerformance({ setlistId, startIndex: 0 })} />
+          <SetlistsView
+            onStartPerformance={(setlistId, startIndex = 0) =>
+              setPerformance({ setlistId, startIndex })
+            }
+          />
         )}
       </main>
 

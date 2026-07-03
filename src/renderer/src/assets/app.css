@@ -114,6 +114,10 @@
   border-bottom: none;
 }
 
+.song-table tbody tr {
+  cursor: pointer;
+}
+
 .song-table tr:hover td {
   background: var(--panel);
 }
@@ -318,6 +322,7 @@
   gap: 0.9rem;
   padding: 0.65rem 1rem;
   border-bottom: 1px solid var(--line);
+  cursor: pointer;
 }
 
 .setlist-song-row:last-child {

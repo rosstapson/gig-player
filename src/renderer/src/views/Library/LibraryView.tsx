@@ -4,7 +4,11 @@ import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { SongForm, type SongFormValues } from '../../components/SongForm'
 import { useLibraryStore } from '../../state/libraryStore'
 
-export function LibraryView(): React.JSX.Element {
+interface LibraryViewProps {
+  onPlaySong: (song: Song) => void
+}
+
+export function LibraryView({ onPlaySong }: LibraryViewProps): React.JSX.Element {
   const { songs, loaded, load, importSong, updateSong, deleteSong } = useLibraryStore()
   const [query, setQuery] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
@@ -95,7 +99,11 @@ export function LibraryView(): React.JSX.Element {
             </thead>
             <tbody>
               {filtered.map((song) => (
-                <tr key={song.id}>
+                <tr
+                  key={song.id}
+                  onDoubleClick={() => onPlaySong(song)}
+                  title="Double-click to play"
+                >
                   <td className="song-title">{song.title}</td>
                   <td>{song.artist}</td>
                   <td className="mono">{song.key}</td>
