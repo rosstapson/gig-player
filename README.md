@@ -26,8 +26,9 @@ Everything lives under the OS user-data directory (`~/.config/gig-player` on Lin
 
 ```
 ~/.config/gig-player/
-  library.json     # song metadata index
-  setlists.json     # setlists index
+  library.json           # song metadata index
+  setlists.json          # setlists index
+  performance-state.json # current setlist + song index while performing, for crash-safe resume
   songs/
     <song-id>/
       audio.<ext>    # copied in on import — never references the original file path
@@ -60,18 +61,27 @@ never mid-tour.
 src/
   main/            # Electron main process
     ipc/           # ipcMain.handle registrations, one file per domain
-    lib/           # filesystem-backed logic (library, setlists, JSON persistence)
+    lib/           # filesystem-backed logic (library, setlists, JSON persistence,
+                   # the gig-media:// protocol handler)
   preload/         # contextBridge — the only surface the renderer can call
   renderer/src/
     views/         # Library, Setlists, Performance
-    components/    # shared UI (forms, confirm dialog)
+    components/    # shared UI (forms, confirm dialog, CD+G canvas renderer, error boundary)
     state/         # Zustand stores
-    lib/           # renderer-only helpers (e.g. file:// URL building)
+    lib/           # renderer-only helpers (e.g. gig-media:// URL building)
   shared/          # types + IPC contract + channel names, imported by both processes
 ```
 
 The renderer never touches the filesystem directly — every read/write goes through
 `window.api.*` (defined in `src/shared/ipc-contract.ts`) and is handled in the main process.
+
+Audio and CD+G files are served to the renderer through a custom `gig-media://` protocol
+(`src/main/lib/mediaProtocol.ts`) rather than plain `file://` URLs. A page loaded from
+`http://localhost` — which is how electron-vite's dev server works — can't load `file://`
+resources at all (Chromium blocks it), so a raw `file://` URL only happened to work in the
+packaged build, where the page itself is loaded via `file://`. The custom protocol works
+identically in both cases, and serves files with proper `Content-Length`/`Accept-Ranges` headers
+so `duration` and seeking resolve correctly.
 
 ## Features
 
@@ -108,9 +118,8 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 
 ## Not built yet
 
-- Backup/export of the full library
-- Timed `.lrc` lyric sync (current lyrics are static with manual scroll via `↑`/`↓`)
-- Per-song volume, fade-out, footswitch/MIDI control, autoplay
+See [TODO.md](TODO.md) for the backlog — per-song volume, `.lrc` sync, footswitch/MIDI, a
+practice-oriented Rehearsal Mode (seek/loop/tempo/key changes), and library backup/export.
 
 ## License
 
