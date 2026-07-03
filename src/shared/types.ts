@@ -37,3 +37,10 @@ export interface Library {
 export interface SetlistsFile {
   setlists: Setlist[]
 }
+
+/** Persisted continuously while Performance Mode is active, so a crash can resume in place. */
+export interface PerformanceState {
+  setlistId: string
+  songIndex: number
+  updatedAt: string
+}

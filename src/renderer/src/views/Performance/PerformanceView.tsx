@@ -6,6 +6,7 @@ import { useSetlistStore } from '../../state/setlistStore'
 
 interface PerformanceViewProps {
   setlistId: string
+  startIndex?: number
   onExit: () => void
 }
 
@@ -16,7 +17,11 @@ interface ArmedSkip {
 
 const ARM_TIMEOUT_MS = 1500
 
-export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): React.JSX.Element {
+export function PerformanceView({
+  setlistId,
+  startIndex = 0,
+  onExit
+}: PerformanceViewProps): React.JSX.Element {
   const { songs } = useLibraryStore()
   const setlist = useSetlistStore((state) => state.setlists.find((s) => s.id === setlistId))
   const songIds = useMemo(() => setlist?.songIds ?? [], [setlist])
@@ -25,10 +30,14 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
     return songIds.map((id) => byId.get(id)).filter((s): s is Song => s !== undefined)
   }, [songs, songIds])
 
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(
+    startIndex >= 0 && startIndex < songIds.length ? startIndex : 0
+  )
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0) // 0-1
   const [lyricsText, setLyricsText] = useState<string | null>(null)
+  const [lyricsError, setLyricsError] = useState<string | null>(null)
+  const [audioError, setAudioError] = useState<string | null>(null)
   const [armed, setArmed] = useState<ArmedSkip | null>(null)
 
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -46,27 +55,50 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
     }
   }, [])
 
+  // Persist where we are on every song change, so a crash can offer to resume here.
+  // A clean exit (handleExit) clears this — a leftover state on next launch means we didn't.
+  useEffect(() => {
+    if (!currentSong) return
+    window.api.performance.saveState({
+      setlistId,
+      songIndex: currentIndex,
+      updatedAt: new Date().toISOString()
+    })
+  }, [setlistId, currentIndex, currentSong])
+
   // Load audio + lyrics whenever the current song changes. Preload immediately so
   // Space starts sound instantly rather than waiting on decoder init.
   useEffect(() => {
     setIsPlaying(false)
     setProgress(0)
     setLyricsText(null)
+    setLyricsError(null)
+    setAudioError(null)
     if (lyricsRef.current) lyricsRef.current.scrollTop = 0
 
     if (!currentSong) return
     let cancelled = false
 
-    window.api.library.resolvePath(currentSong.audioFile).then((absPath) => {
-      if (cancelled || !audioRef.current) return
-      audioRef.current.src = toFileUrl(absPath)
-      audioRef.current.load()
-    })
+    window.api.library
+      .resolvePath(currentSong.audioFile)
+      .then((absPath) => {
+        if (cancelled || !audioRef.current) return
+        audioRef.current.src = toFileUrl(absPath)
+        audioRef.current.load()
+      })
+      .catch((err) => {
+        if (!cancelled) setAudioError(err instanceof Error ? err.message : String(err))
+      })
 
     if (currentSong.lyricsFile) {
-      window.api.library.readText(currentSong.lyricsFile).then((text) => {
-        if (!cancelled) setLyricsText(text)
-      })
+      window.api.library
+        .readText(currentSong.lyricsFile)
+        .then((text) => {
+          if (!cancelled) setLyricsText(text)
+        })
+        .catch(() => {
+          if (!cancelled) setLyricsError('Lyrics file is missing or unreadable.')
+        })
     }
 
     return () => {
@@ -96,7 +128,7 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
   function togglePlay(): void {
     const audio = audioRef.current
     if (!audio) return
-    if (audio.paused) audio.play()
+    if (audio.paused) audio.play().catch((err) => setAudioError(err.message))
     else audio.pause()
   }
 
@@ -111,6 +143,7 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
 
   function handleExit(): void {
     audioRef.current?.pause()
+    window.api.performance.clearState()
     onExit()
   }
 
@@ -209,8 +242,16 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
         </div>
       )}
 
+      {audioError && (
+        <div className="performance-armed-banner performance-error-banner">
+          Audio file is missing or unreadable — {currentSong.title} can't be played.
+        </div>
+      )}
+
       <div className="performance-lyrics" ref={lyricsRef}>
-        {lyricsText ? (
+        {lyricsError ? (
+          <p className="performance-no-lyrics performance-error-text">{lyricsError}</p>
+        ) : lyricsText ? (
           <pre>{lyricsText}</pre>
         ) : (
           <p className="performance-no-lyrics">No lyrics for this song.</p>
@@ -225,6 +266,7 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
           className="performance-play"
           onClick={togglePlay}
           aria-label={isPlaying ? 'Pause' : 'Play'}
+          disabled={audioError !== null}
         >
           {isPlaying ? '❚❚' : '▶'}
         </button>
@@ -238,6 +280,7 @@ export function PerformanceView({ setlistId, onExit }: PerformanceViewProps): Re
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
+        onError={() => setAudioError('Audio file is missing or unreadable.')}
         onTimeUpdate={(e) => {
           const audio = e.currentTarget
           if (audio.duration > 0) setProgress(audio.currentTime / audio.duration)

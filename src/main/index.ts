@@ -2,9 +2,12 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { registerDiagnosticsIpc } from './ipc/diagnostics'
 import { registerLibraryIpc } from './ipc/library'
 import { registerPerformanceIpc } from './ipc/performance'
 import { registerSetlistsIpc } from './ipc/setlists'
+import { listSongs } from './lib/library'
+import { listSetlists } from './lib/setlists'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -30,6 +33,12 @@ function createWindow(): void {
   win.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  // A renderer crash mid-gig should self-heal rather than leave a permanently blank window.
+  win.webContents.on('render-process-gone', (_event, details) => {
+    console.error('Renderer process gone, reloading:', details.reason)
+    win.reload()
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -58,6 +67,11 @@ app.whenReady().then(() => {
   registerLibraryIpc()
   registerSetlistsIpc()
   registerPerformanceIpc(() => mainWindow)
+  registerDiagnosticsIpc()
+
+  // Read once up front so any corrupted file is detected before the renderer asks for warnings.
+  listSongs()
+  listSetlists()
 
   createWindow()
 

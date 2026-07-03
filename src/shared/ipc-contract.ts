@@ -1,4 +1,4 @@
-import type { NewSong, Setlist, Song } from './types'
+import type { NewSong, PerformanceState, Setlist, Song } from './types'
 
 /** Everything needed to import a song: metadata plus absolute source paths picked via native dialogs. */
 export interface ImportSongInput extends Omit<NewSong, 'audioFile' | 'lyricsFile'> {
@@ -40,5 +40,14 @@ export interface GigPlayerAPI {
     start(): Promise<void>
     /** Exits fullscreen and releases the sleep block. */
     stop(): Promise<void>
+    /** Persists where we are, so a crash can offer to resume in the same spot. */
+    saveState(state: PerformanceState): Promise<void>
+    loadState(): Promise<PerformanceState | null>
+    /** Called on a clean exit — a leftover state on next launch means we didn't exit cleanly. */
+    clearState(): Promise<void>
+  }
+  diagnostics: {
+    /** Human-readable warnings about anything recovered from at startup (e.g. corrupted data files). */
+    getStartupWarnings(): Promise<string[]>
   }
 }

@@ -13,6 +13,10 @@ export function getSetlistsFile(): string {
   return join(getDataDir(), 'setlists.json')
 }
 
+export function getPerformanceStateFile(): string {
+  return join(getDataDir(), 'performance-state.json')
+}
+
 export function getSongsDir(): string {
   return join(getDataDir(), 'songs')
 }

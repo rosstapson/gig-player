@@ -18,6 +18,12 @@ export const IPC = {
   },
   performance: {
     start: 'performance:start',
-    stop: 'performance:stop'
+    stop: 'performance:stop',
+    saveState: 'performance:saveState',
+    loadState: 'performance:loadState',
+    clearState: 'performance:clearState'
+  },
+  diagnostics: {
+    getStartupWarnings: 'diagnostics:getStartupWarnings'
   }
 } as const

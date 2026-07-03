@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { IPC } from '@shared/channels'
 import type { ImportSongInput, SongPatch } from '@shared/ipc-contract'
+import type { PerformanceState } from '@shared/types'
 
 const api = {
   library: {
@@ -26,7 +27,13 @@ const api = {
   },
   performance: {
     start: () => ipcRenderer.invoke(IPC.performance.start),
-    stop: () => ipcRenderer.invoke(IPC.performance.stop)
+    stop: () => ipcRenderer.invoke(IPC.performance.stop),
+    saveState: (state: PerformanceState) => ipcRenderer.invoke(IPC.performance.saveState, state),
+    loadState: () => ipcRenderer.invoke(IPC.performance.loadState),
+    clearState: () => ipcRenderer.invoke(IPC.performance.clearState)
+  },
+  diagnostics: {
+    getStartupWarnings: () => ipcRenderer.invoke(IPC.diagnostics.getStartupWarnings)
   }
 }
 
