@@ -90,6 +90,7 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
 
     if (audioRef.current) {
       audioRef.current.src = toMediaUrl(currentSong.audioFile)
+      audioRef.current.volume = currentSong.volume
       audioRef.current.load()
     }
 

@@ -8,6 +8,7 @@ export interface SongFormValues {
   tempo: number | null
   notes: string
   lyricsFormat: LyricsFormat
+  volume: number
   sourceAudioPath: string | null
   sourceLyricsPath: string | null
 }
@@ -30,6 +31,7 @@ export function SongForm({ mode, initial, onCancel, onSubmit }: SongFormProps): 
   const [tempo, setTempo] = useState(initial?.tempo != null ? String(initial.tempo) : '')
   const [notes, setNotes] = useState(initial?.notes ?? '')
   const [lyricsFormat, setLyricsFormat] = useState<LyricsFormat>(initial?.lyricsFormat ?? 'text')
+  const [volume, setVolume] = useState(initial?.volume ?? 1)
   const [audioPath, setAudioPath] = useState<string | null>(null)
   const [lyricsPath, setLyricsPath] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -67,6 +69,7 @@ export function SongForm({ mode, initial, onCancel, onSubmit }: SongFormProps): 
         tempo: tempo.trim() === '' ? null : Number(tempo),
         notes,
         lyricsFormat,
+        volume,
         sourceAudioPath: audioPath,
         sourceLyricsPath: lyricsPath
       })
@@ -139,6 +142,18 @@ export function SongForm({ mode, initial, onCancel, onSubmit }: SongFormProps): 
             <option value="lrc">Timed (.lrc)</option>
             <option value="cdg">CD+G (.cdg)</option>
           </select>
+        </label>
+
+        <label className="field">
+          <span>Volume — {Math.round(volume * 100)}%</span>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={volume}
+            onChange={(e) => setVolume(Number(e.target.value))}
+          />
         </label>
 
         {error && <p className="form-error">{error}</p>}

@@ -12,7 +12,7 @@ export interface Song {
   /** Path relative to the userData dir, e.g. "songs/<id>/lyrics.md" */
   lyricsFile: string | null
   lyricsFormat: LyricsFormat
-  /** 0-1, reserved for per-song volume (post-MVP) */
+  /** 0-1, applied to the audio element during Performance Mode playback */
   volume: number
   createdAt: string
   updatedAt: string

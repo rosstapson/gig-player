@@ -5,8 +5,6 @@ so they don't get lost.
 
 ## Performance Mode
 
-- **Per-song volume** — the `Song.volume` field already exists in the schema (reserved, currently
-  unused); wire it up to actually scale playback level per song.
 - **Timed `.lrc` lyric sync** — highlight the current line automatically instead of manual scroll
   only.
 - **Fade-out** — on stop or song end.

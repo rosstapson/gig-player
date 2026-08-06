@@ -36,7 +36,7 @@ export function LibraryView({ onPlaySong }: LibraryViewProps): React.JSX.Element
       tempo: values.tempo,
       notes: values.notes,
       lyricsFormat: values.lyricsFormat,
-      volume: 1,
+      volume: values.volume,
       sourceAudioPath: values.sourceAudioPath,
       sourceLyricsPath: values.sourceLyricsPath
     })
@@ -51,7 +51,8 @@ export function LibraryView({ onPlaySong }: LibraryViewProps): React.JSX.Element
       key: values.key,
       tempo: values.tempo,
       notes: values.notes,
-      lyricsFormat: values.lyricsFormat
+      lyricsFormat: values.lyricsFormat,
+      volume: values.volume
     })
     setEditingSong(null)
   }
