@@ -18,6 +18,7 @@ interface ArmedSkip {
 }
 
 const ARM_TIMEOUT_MS = 1500
+const FADE_OUT_SECONDS = 3
 
 export function PerformanceView(props: PerformanceViewProps): React.JSX.Element {
   const { startIndex = 0, onExit } = props
@@ -155,6 +156,9 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
     if (!audio) return
     audio.pause()
     audio.currentTime = 0
+    // Emergency stop is intentionally instant, not faded — restore full volume here in case
+    // it was cut mid-fade-out, so a replay of the same song doesn't start quiet.
+    if (currentSong) audio.volume = currentSong.volume
     setIsPlaying(false)
     setProgress(0)
   }
@@ -299,11 +303,22 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
         ref={audioRef}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
+        onEnded={(e) => {
+          setIsPlaying(false)
+          // The fade-out below hits 0 right at the end — undo it so a replay of the
+          // same song (no src reload, which is what normally restores volume) isn't silent.
+          if (currentSong) e.currentTarget.volume = currentSong.volume
+        }}
         onError={() => setAudioError('Audio file is missing or unreadable.')}
         onTimeUpdate={(e) => {
           const audio = e.currentTarget
-          if (audio.duration > 0) setProgress(audio.currentTime / audio.duration)
+          if (audio.duration <= 0) return
+          setProgress(audio.currentTime / audio.duration)
+
+          const remaining = audio.duration - audio.currentTime
+          if (currentSong && remaining <= FADE_OUT_SECONDS) {
+            audio.volume = currentSong.volume * Math.max(0, remaining / FADE_OUT_SECONDS)
+          }
         }}
       />
     </div>
