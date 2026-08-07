@@ -6,9 +6,10 @@ import { useLibraryStore } from '../../state/libraryStore'
 
 interface LibraryViewProps {
   onPlaySong: (song: Song) => void
+  onPracticeSong: (song: Song) => void
 }
 
-export function LibraryView({ onPlaySong }: LibraryViewProps): React.JSX.Element {
+export function LibraryView({ onPlaySong, onPracticeSong }: LibraryViewProps): React.JSX.Element {
   const { songs, loaded, load, importSong, updateSong, deleteSong } = useLibraryStore()
   const [query, setQuery] = useState('')
   const [showAddForm, setShowAddForm] = useState(false)
@@ -111,13 +112,13 @@ export function LibraryView({ onPlaySong }: LibraryViewProps): React.JSX.Element
                   <td className="mono">{song.tempo ?? '—'}</td>
                   <td className="song-notes">{song.notes}</td>
                   <td className="song-actions">
+                    <button className="btn-link" onClick={() => onPracticeSong(song)}>
+                      Practice
+                    </button>
                     <button className="btn-link" onClick={() => setEditingSong(song)}>
                       Edit
                     </button>
-                    <button
-                      className="btn-link btn-danger"
-                      onClick={() => setPendingDelete(song)}
-                    >
+                    <button className="btn-link btn-danger" onClick={() => setPendingDelete(song)}>
                       Delete
                     </button>
                   </td>

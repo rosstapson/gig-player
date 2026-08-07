@@ -5,6 +5,7 @@ import { useSettingsStore } from './state/settingsStore'
 import { useSetlistStore } from './state/setlistStore'
 import { LibraryView } from './views/Library/LibraryView'
 import { PerformanceView } from './views/Performance/PerformanceView'
+import { RehearsalView } from './views/Rehearsal/RehearsalView'
 import { SetlistsView } from './views/Setlists/SetlistsView'
 
 type Tab = 'library' | 'setlists'
@@ -14,6 +15,7 @@ type ActivePerformance = ({ setlistId: string } | { songs: Song[] }) & { startIn
 function App(): React.JSX.Element {
   const [tab, setTab] = useState<Tab>('library')
   const [performance, setPerformance] = useState<ActivePerformance | null>(null)
+  const [rehearsal, setRehearsal] = useState<Song | null>(null)
   const [resumeState, setResumeState] = useState<PerformanceState | null>(null)
   const [warnings, setWarnings] = useState<string[]>([])
 
@@ -76,6 +78,10 @@ function App(): React.JSX.Element {
     )
   }
 
+  if (rehearsal) {
+    return <RehearsalView song={rehearsal} onExit={() => setRehearsal(null)} />
+  }
+
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -111,7 +117,10 @@ function App(): React.JSX.Element {
 
       <main className="app-body">
         {tab === 'library' && (
-          <LibraryView onPlaySong={(song) => setPerformance({ songs: [song], startIndex: 0 })} />
+          <LibraryView
+            onPlaySong={(song) => setPerformance({ songs: [song], startIndex: 0 })}
+            onPracticeSong={(song) => setRehearsal(song)}
+          />
         )}
         {tab === 'setlists' && (
           <SetlistsView

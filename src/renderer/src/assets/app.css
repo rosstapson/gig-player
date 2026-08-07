@@ -761,3 +761,138 @@
   gap: 0.75rem;
   margin-top: 0.25rem;
 }
+
+.rehearsal-view {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1.75rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.rehearsal-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+}
+
+.rehearsal-title {
+  flex: 1;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.rehearsal-artist {
+  color: var(--ink-muted);
+  font-weight: 400;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.rehearsal-meta {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.rehearsal-loading {
+  text-align: center;
+}
+
+.rehearsal-seek {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.5rem;
+}
+
+.rehearsal-seek-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--line);
+  border-radius: 99px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.rehearsal-seek-progress {
+  height: 100%;
+  background: var(--gel);
+}
+
+.rehearsal-seek-loop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(230, 161, 58, 0.3);
+}
+
+.rehearsal-seek input[type='range'] {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.rehearsal-seek input[type='range']::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 4px;
+}
+
+.rehearsal-seek input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--gel);
+  cursor: pointer;
+}
+
+.rehearsal-time {
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  margin-top: -1.25rem;
+}
+
+.rehearsal-transport {
+  display: flex;
+  justify-content: center;
+}
+
+.rehearsal-loop-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rehearsal-loop-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.rehearsal-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rehearsal-slider-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.9rem;
+}
+
+.rehearsal-slider-row .field {
+  flex: 1;
+}

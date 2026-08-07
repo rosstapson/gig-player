@@ -7,8 +7,9 @@ surprise updates. All data lives in local files on the machine you run it on.
 ## Why
 
 Most backing-track/lyrics tools are either bloated DAWs or fragile web pages. This is neither:
-a small Electron app that does exactly three things — hold a song library, build setlists from
-it, and run a fullscreen performance view with big lyrics and a handful of keyboard shortcuts.
+a small Electron app that does a handful of things well — hold a song library, build setlists
+from it, run a fullscreen performance view with big lyrics and a handful of keyboard shortcuts,
+and give you a practice-oriented Rehearsal Mode for learning a song before it hits a setlist.
 
 ## Tech stack
 
@@ -19,6 +20,10 @@ it, and run a fullscreen performance view with big lyrics and a handful of keybo
 - **Zustand** for renderer-side state (per-view stores, no global framework).
 - **Plain JSON files** for storage — no embedded database. Human-readable, diffable, and easy to
   back up by copying a folder.
+- **Web Audio + [SoundTouchJS](https://github.com/cutterbl/SoundTouchJS) AudioWorklet** for
+  Rehearsal Mode's independent tempo/key control — a plain `<audio>` element's `playbackRate`
+  always ties pitch and tempo together, which is exactly what that view needs to pull apart. See
+  the Rehearsal Mode section below for how the two playback engines relate.
 
 ## Data location
 
@@ -66,7 +71,7 @@ src/
                    # the gig-media:// protocol handler)
   preload/         # contextBridge — the only surface the renderer can call
   renderer/src/
-    views/         # Library, Setlists, Performance
+    views/         # Library, Setlists, Performance, Rehearsal
     components/    # shared UI (forms, confirm dialog, CD+G canvas renderer, error boundary)
     state/         # Zustand stores
     lib/           # renderer-only helpers (e.g. gig-media:// URL building)
@@ -112,6 +117,15 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 - Optional autoplay (off by default) auto-advances to the next song when one ends, toggled from
   the header and persisted across restarts
 
+**Rehearsal Mode** — a practice-oriented view for learning a song, separate from the stage view
+(open it via the "Practice" button on a Library row):
+- Draggable seek bar
+- Loop a section: mark a start/end point (`[`/`]` or buttons) and repeat it indefinitely
+- Change tempo (50%–150%) without affecting pitch
+- Change key up/down by up to an octave (semitones) without affecting tempo
+- Built on the Web Audio API rather than Performance Mode's plain `<audio>` element, specifically
+  so tempo and pitch can move independently — see Tech stack above
+
 **Reliability hardening**:
 - Crash-safe resume — the current setlist + song index is persisted continuously while
   performing; if the app doesn't exit cleanly, the next launch offers to resume right where it
@@ -126,8 +140,7 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 
 ## Not built yet
 
-See [TODO.md](TODO.md) for the backlog — footswitch/MIDI, a practice-oriented Rehearsal Mode
-(seek/loop/tempo/key changes), and library backup/export.
+See [TODO.md](TODO.md) for the backlog — footswitch/MIDI control and library backup/export.
 
 ## License
 

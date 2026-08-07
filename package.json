@@ -23,6 +23,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
+    "@soundtouchjs/audio-worklet": "^2.1.1",
     "cdgraphics": "^7.0.0",
     "zustand": "^5.0.14"
   },
