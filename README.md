@@ -92,6 +92,13 @@ packaged build, where the page itself is loaded via `file://`. The custom protoc
 identically in both cases, and serves files with proper `Content-Length`/`Accept-Ranges` headers
 so `duration` and seeking resolve correctly.
 
+Electron denies every renderer permission request by default; `src/main/index.ts` explicitly
+allows the Web MIDI API (for footswitch/MIDI binding) and nothing else. Worth knowing if you're
+debugging MIDI on a different Electron version: this app's installed Electron 39.2.6 reports
+*every* `requestMIDIAccess()` call to the permission handlers as `'midiSysex'`, never plain
+`'midi'`, even with no sysex option requested anywhere — confirmed empirically, not from Chromium's
+documented behavior, which describes them as distinct permissions. The handler allows both names.
+
 ## Features
 
 **Song library** — add songs with title, artist, key, tempo, notes, per-song playback volume;
@@ -121,6 +128,10 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
   stays instant on purpose
 - Optional autoplay (off by default) auto-advances to the next song when one ends, toggled from
   the header and persisted across restarts
+- Play/pause, next, prev, and stop can each be bound to a footswitch key or a MIDI note/CC/program
+  change, via "Footswitch / MIDI…" in the header. Bindings are additive — they never replace the
+  built-in keyboard shortcuts, and next/prev bindings go through the same arm-then-confirm safety
+  check the arrow keys do
 
 **Rehearsal Mode** — a practice-oriented view for learning a song, separate from the stage view
 (open it via the "Practice" button on a Library row):
@@ -145,7 +156,7 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 
 ## Not built yet
 
-See [TODO.md](TODO.md) for the backlog — footswitch/MIDI control.
+See [TODO.md](TODO.md) — empty right now.
 
 ## License
 

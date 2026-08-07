@@ -9,7 +9,7 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-  settings: { autoplay: false },
+  settings: { autoplay: false, inputBindings: {} },
   loaded: false,
 
   async load() {

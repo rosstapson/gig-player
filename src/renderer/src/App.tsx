@@ -1,5 +1,6 @@
 import type { PerformanceState, Song } from '@shared/types'
 import { useEffect, useState } from 'react'
+import { InputBindingsModal } from './components/InputBindingsModal'
 import { useLibraryStore } from './state/libraryStore'
 import { useSettingsStore } from './state/settingsStore'
 import { useSetlistStore } from './state/setlistStore'
@@ -18,6 +19,7 @@ function App(): React.JSX.Element {
   const [rehearsal, setRehearsal] = useState<Song | null>(null)
   const [resumeState, setResumeState] = useState<PerformanceState | null>(null)
   const [warnings, setWarnings] = useState<string[]>([])
+  const [showBindings, setShowBindings] = useState(false)
 
   const { setlists, loaded: setlistsLoaded, load: loadSetlists } = useSetlistStore()
   const { loaded: libraryLoaded, load: loadLibrary } = useLibraryStore()
@@ -73,6 +75,7 @@ function App(): React.JSX.Element {
           : { songs: performance.songs })}
         startIndex={performance.startIndex}
         autoplay={settings.autoplay}
+        inputBindings={settings.inputBindings}
         onExit={() => setPerformance(null)}
       />
     )
@@ -105,6 +108,9 @@ function App(): React.JSX.Element {
           />
           Autoplay next song
         </label>
+        <button className="btn-secondary" onClick={() => setShowBindings(true)}>
+          Footswitch / MIDI…
+        </button>
       </header>
 
       {warnings.length > 0 && (
@@ -130,6 +136,14 @@ function App(): React.JSX.Element {
           />
         )}
       </main>
+
+      {showBindings && (
+        <InputBindingsModal
+          inputBindings={settings.inputBindings}
+          onChange={(next) => setSettings({ inputBindings: next })}
+          onClose={() => setShowBindings(false)}
+        />
+      )}
 
       {resumeIsValid && resumeState && resumeSetlist && (
         <div className="modal-backdrop">

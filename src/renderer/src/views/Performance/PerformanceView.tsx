@@ -1,9 +1,10 @@
-import type { Song } from '@shared/types'
+import type { BindableAction, Settings, Song } from '@shared/types'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CdgLyricsView } from '../../components/CdgLyricsView'
 import { LrcLyricsView } from '../../components/LrcLyricsView'
 import { toMediaUrl } from '../../lib/fileUrl'
 import { type LrcLine, parseLrc } from '../../lib/lrc'
+import { isActivation, useMidiMessage } from '../../lib/midi'
 import { useLibraryStore } from '../../state/libraryStore'
 import { useSetlistStore } from '../../state/setlistStore'
 
@@ -13,6 +14,8 @@ type PerformanceViewProps = PerformanceSource & {
   startIndex?: number
   /** Auto-advance to the next song when one ends, instead of stopping and waiting. */
   autoplay?: boolean
+  /** Custom footswitch/MIDI triggers, additive on top of the hardcoded keyboard shortcuts. */
+  inputBindings?: Settings['inputBindings']
   onExit: () => void
 }
 
@@ -25,7 +28,7 @@ const ARM_TIMEOUT_MS = 1500
 const FADE_OUT_SECONDS = 3
 
 export function PerformanceView(props: PerformanceViewProps): React.JSX.Element {
-  const { startIndex = 0, autoplay = false, onExit } = props
+  const { startIndex = 0, autoplay = false, inputBindings = {}, onExit } = props
   const setlistId = 'setlistId' in props ? props.setlistId : null
   const ephemeralSongs = 'songs' in props ? props.songs : null
 
@@ -205,6 +208,26 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
     lyricsRef.current?.scrollBy({ top: delta, behavior: 'smooth' })
   }
 
+  // Shared by both the custom-key check below and the MIDI listener, so a footswitch/pedal bound
+  // to next/prev goes through the exact same arm-then-confirm safety path the arrow keys do,
+  // rather than skipping instantly just because it came from a different input device.
+  function triggerAction(action: BindableAction): void {
+    switch (action) {
+      case 'togglePlay':
+        togglePlay()
+        break
+      case 'next':
+        requestSkip('next')
+        break
+      case 'prev':
+        requestSkip('prev')
+        break
+      case 'stop':
+        handleStop()
+        break
+    }
+  }
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent): void {
       switch (e.key) {
@@ -233,11 +256,27 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
           handleExit()
           break
       }
+      // Custom footswitch key bindings — additive on top of the hardcoded shortcuts above,
+      // never a replacement for them.
+      for (const [action, binding] of Object.entries(inputBindings)) {
+        if (binding?.type === 'key' && binding.key === e.key) {
+          e.preventDefault()
+          triggerAction(action as BindableAction)
+        }
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, armed, orderedSongs.length])
+  }, [currentIndex, armed, orderedSongs.length, inputBindings])
+
+  useMidiMessage((statusType, data1, data2) => {
+    for (const [action, binding] of Object.entries(inputBindings)) {
+      if (binding?.type === 'midi' && isActivation(statusType, data1, data2, binding)) {
+        triggerAction(action as BindableAction)
+      }
+    }
+  })
 
   useEffect(() => clearArmTimeout, [])
 

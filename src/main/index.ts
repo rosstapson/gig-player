@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, session, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -14,6 +14,15 @@ import { listSetlists } from './lib/setlists'
 
 // Must happen before app.whenReady() — Electron only accepts scheme privileges up to that point.
 registerMediaProtocolScheme()
+
+// Electron denies all permission requests by default. Web MIDI (for footswitch/MIDI-controller
+// binding in Performance Mode) is the only one this app needs. Note: despite requesting plain
+// navigator.requestMIDIAccess() with no sysex option anywhere in the renderer, this Electron
+// build reports every MIDI access request to these handlers as the 'midiSysex' permission, never
+// plain 'midi' — confirmed empirically, not from documentation, which describes them as distinct.
+// Both names are allowed here so this keeps working if a future Electron version reports it as
+// documented.
+const ALLOWED_MIDI_PERMISSIONS = new Set(['midi', 'midiSysex'])
 
 let mainWindow: BrowserWindow | null = null
 
@@ -68,6 +77,13 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  session.defaultSession.setPermissionCheckHandler((_webContents, permission) =>
+    ALLOWED_MIDI_PERMISSIONS.has(permission)
+  )
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+    callback(ALLOWED_MIDI_PERMISSIONS.has(permission))
   })
 
   registerLibraryIpc()

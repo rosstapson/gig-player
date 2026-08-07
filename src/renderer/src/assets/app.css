@@ -900,3 +900,31 @@
 .rehearsal-slider-row .field {
   flex: 1;
 }
+
+.input-bindings-modal {
+  width: 36rem;
+}
+
+.bindings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  margin-top: 0.5rem;
+}
+
+.bindings-table td {
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.bindings-table tr:last-child td {
+  border-bottom: none;
+}
+
+.bindings-row-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  white-space: nowrap;
+}

@@ -3,11 +3,15 @@ import { readJson, writeJson } from './jsonStore'
 import { getSettingsFile } from './paths'
 
 const DEFAULT_SETTINGS: Settings = {
-  autoplay: false
+  autoplay: false,
+  inputBindings: {}
 }
 
 export function getSettings(): Settings {
-  return readJson<Settings>(getSettingsFile(), DEFAULT_SETTINGS)
+  // Merge onto DEFAULT_SETTINGS rather than returning the parsed file directly — a settings.json
+  // written before a field like inputBindings existed won't have it, and reading that field on
+  // the raw parsed object would crash the renderer instead of quietly filling in the default.
+  return { ...DEFAULT_SETTINGS, ...readJson<Partial<Settings>>(getSettingsFile(), {}) }
 }
 
 export function updateSettings(patch: Partial<Settings>): Settings {

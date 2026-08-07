@@ -48,4 +48,13 @@ export interface PerformanceState {
 export interface Settings {
   /** Explicit opt-in to auto-advance to the next song when one ends. Off by default. */
   autoplay: boolean
+  /** Custom footswitch/MIDI triggers for Performance Mode actions, additive on top of the
+   *  built-in keyboard shortcuts (never replaces them). */
+  inputBindings: Partial<Record<BindableAction, InputBinding>>
 }
+
+export type BindableAction = 'togglePlay' | 'next' | 'prev' | 'stop'
+
+export type InputBinding =
+  | { type: 'key'; key: string } // matches KeyboardEvent.key
+  | { type: 'midi'; statusType: number; data1: number } // channel-masked status (0x90/0xB0/0xC0) + note/CC/program number
