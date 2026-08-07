@@ -39,6 +39,9 @@ const api = {
   settings: {
     get: () => ipcRenderer.invoke(IPC.settings.get),
     set: (patch: Partial<Settings>) => ipcRenderer.invoke(IPC.settings.set, patch)
+  },
+  backup: {
+    exportLibrary: () => ipcRenderer.invoke(IPC.backup.exportLibrary)
   }
 }
 

@@ -7,7 +7,3 @@ so they don't get lost.
 
 - **Footswitch / MIDI control** — map a footswitch (likely USB-HID, acts as a keyboard) or a MIDI
   controller to the existing play/pause/next/prev/stop actions.
-
-## Library / Setlists
-
-- Backup/export of the full library (zip of the data dir).

@@ -15,6 +15,8 @@ export function LibraryView({ onPlaySong, onPracticeSong }: LibraryViewProps): R
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingSong, setEditingSong] = useState<Song | null>(null)
   const [pendingDelete, setPendingDelete] = useState<Song | null>(null)
+  const [exporting, setExporting] = useState(false)
+  const [exportStatus, setExportStatus] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loaded) load()
@@ -64,6 +66,19 @@ export function LibraryView({ onPlaySong, onPracticeSong }: LibraryViewProps): R
     setPendingDelete(null)
   }
 
+  async function handleExport(): Promise<void> {
+    setExporting(true)
+    setExportStatus(null)
+    try {
+      const path = await window.api.backup.exportLibrary()
+      if (path) setExportStatus(`Backup saved to ${path}`)
+    } catch (err) {
+      setExportStatus(err instanceof Error ? `Export failed: ${err.message}` : 'Export failed.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="library-view">
       <div className="library-toolbar">
@@ -74,10 +89,15 @@ export function LibraryView({ onPlaySong, onPracticeSong }: LibraryViewProps): R
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <button className="btn-secondary" onClick={handleExport} disabled={exporting}>
+          {exporting ? 'Exporting…' : 'Export library…'}
+        </button>
         <button className="btn-primary" onClick={() => setShowAddForm(true)}>
           Add song
         </button>
       </div>
+
+      {exportStatus && <p className="muted export-status">{exportStatus}</p>}
 
       {loaded && songs.length === 0 && (
         <div className="empty-state">

@@ -158,6 +158,10 @@
   text-align: center;
 }
 
+.export-status {
+  margin-bottom: 1.5rem;
+}
+
 .crash-fallback {
   position: fixed;
   inset: 0;

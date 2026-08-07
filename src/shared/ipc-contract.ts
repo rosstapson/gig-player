@@ -57,4 +57,9 @@ export interface GigPlayerAPI {
     /** Merges the patch into the persisted settings and returns the full result. */
     set(patch: Partial<Settings>): Promise<Settings>
   }
+  backup: {
+    /** Opens a native save dialog and zips the full data dir to the chosen path. Returns the
+     *  chosen path, or null if the user cancelled. */
+    exportLibrary(): Promise<string | null>
+  }
 }

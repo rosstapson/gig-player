@@ -30,5 +30,8 @@ export const IPC = {
   settings: {
     get: 'settings:get',
     set: 'settings:set'
+  },
+  backup: {
+    exportLibrary: 'backup:exportLibrary'
   }
 } as const

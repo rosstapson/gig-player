@@ -24,6 +24,7 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@soundtouchjs/audio-worklet": "^2.1.1",
+    "archiver": "^8.0.0",
     "cdgraphics": "^7.0.0",
     "zustand": "^5.0.14"
   },
@@ -31,6 +32,7 @@
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
+    "@types/archiver": "^8.0.0",
     "@types/node": "^22.19.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

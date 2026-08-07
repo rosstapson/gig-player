@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { registerBackupIpc } from './ipc/backup'
 import { registerDiagnosticsIpc } from './ipc/diagnostics'
 import { registerLibraryIpc } from './ipc/library'
 import { registerPerformanceIpc } from './ipc/performance'
@@ -74,6 +75,7 @@ app.whenReady().then(() => {
   registerPerformanceIpc(() => mainWindow)
   registerDiagnosticsIpc()
   registerSettingsIpc()
+  registerBackupIpc()
   registerMediaProtocolHandler()
 
   // Read once up front so any corrupted file is detected before the renderer asks for warnings.

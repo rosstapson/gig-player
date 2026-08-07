@@ -44,6 +44,9 @@ Everything lives under the OS user-data directory (`~/.config/gig-player` on Lin
 Audio and lyrics files are **copied** into this managed directory when you add a song, rather
 than referenced in place — so a renamed or moved source file can never break a song mid-gig.
 
+To restore an "Export library…" backup, quit the app, unzip it, and copy `library.json`,
+`setlists.json`, `settings.json`, and `songs/` into this directory (overwriting what's there).
+
 ## Running it
 
 ```bash
@@ -94,7 +97,9 @@ so `duration` and seeking resolve correctly.
 **Song library** — add songs with title, artist, key, tempo, notes, per-song playback volume;
 audio (MP3/WAV/FLAC) and lyrics (plain text, Markdown source, timed `.lrc`, or CD+G `.cdg`
 karaoke graphics) files are copied in on import. Search, edit, delete. Double-click a song to
-play it standalone in Performance Mode.
+play it standalone in Performance Mode. "Export library…" zips the library/setlists/settings
+JSON plus every song's audio and lyrics files — not the whole data directory, which also holds
+Chromium's own browser-profile cache/cookies — to a location you choose.
 
 **Setlists** — create/rename/delete setlists, add songs from the library, reorder with
 up/down controls, remove. Double-click a song in a setlist to start performing from there.
@@ -140,7 +145,7 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 
 ## Not built yet
 
-See [TODO.md](TODO.md) for the backlog — footswitch/MIDI control and library backup/export.
+See [TODO.md](TODO.md) for the backlog — footswitch/MIDI control.
 
 ## License
 
