@@ -85,9 +85,10 @@ so `duration` and seeking resolve correctly.
 
 ## Features
 
-**Song library** — add songs with title, artist, key, tempo, notes; audio (MP3/WAV/FLAC) and
-lyrics (plain text, Markdown source, or CD+G `.cdg` karaoke graphics) files are copied in on
-import. Search, edit, delete. Double-click a song to play it standalone in Performance Mode.
+**Song library** — add songs with title, artist, key, tempo, notes, per-song playback volume;
+audio (MP3/WAV/FLAC) and lyrics (plain text, Markdown source, timed `.lrc`, or CD+G `.cdg`
+karaoke graphics) files are copied in on import. Search, edit, delete. Double-click a song to
+play it standalone in Performance Mode.
 
 **Setlists** — create/rename/delete setlists, add songs from the library, reorder with
 up/down controls, remove. Double-click a song in a setlist to start performing from there.
@@ -103,6 +104,10 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
   silently or crashing
 - `.cdg` karaoke files render as a synced canvas overlay (via [cdgraphics](https://github.com/bhj/cdgraphics)),
   driven directly off the audio element's `currentTime`
+- Timed `.lrc` lyrics auto-highlight the current line off the same `currentTime`, instead of
+  requiring manual scroll
+- Playback fades out over the last few seconds before a song ends naturally; the emergency stop
+  stays instant on purpose
 
 **Reliability hardening**:
 - Crash-safe resume — the current setlist + song index is persisted continuously while
@@ -118,7 +123,7 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 
 ## Not built yet
 
-See [TODO.md](TODO.md) for the backlog — per-song volume, `.lrc` sync, footswitch/MIDI, a
+See [TODO.md](TODO.md) for the backlog — footswitch/MIDI, an autoplay setting, a
 practice-oriented Rehearsal Mode (seek/loop/tempo/key changes), and library backup/export.
 
 ## License

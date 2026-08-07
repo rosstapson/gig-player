@@ -1,7 +1,9 @@
 import type { Song } from '@shared/types'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CdgLyricsView } from '../../components/CdgLyricsView'
+import { LrcLyricsView } from '../../components/LrcLyricsView'
 import { toMediaUrl } from '../../lib/fileUrl'
+import { type LrcLine, parseLrc } from '../../lib/lrc'
 import { useLibraryStore } from '../../state/libraryStore'
 import { useSetlistStore } from '../../state/setlistStore'
 
@@ -42,6 +44,7 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0) // 0-1
   const [lyricsText, setLyricsText] = useState<string | null>(null)
+  const [lrcLines, setLrcLines] = useState<LrcLine[] | null>(null)
   const [cdgData, setCdgData] = useState<ArrayBuffer | null>(null)
   const [lyricsError, setLyricsError] = useState<string | null>(null)
   const [audioError, setAudioError] = useState<string | null>(null)
@@ -81,6 +84,7 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
     setIsPlaying(false)
     setProgress(0)
     setLyricsText(null)
+    setLrcLines(null)
     setCdgData(null)
     setLyricsError(null)
     setAudioError(null)
@@ -108,6 +112,15 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
         })
         .catch(() => {
           if (!cancelled) setLyricsError('CD+G file is missing or unreadable.')
+        })
+    } else if (currentSong.lyricsFile && currentSong.lyricsFormat === 'lrc') {
+      window.api.library
+        .readText(currentSong.lyricsFile)
+        .then((text) => {
+          if (!cancelled) setLrcLines(parseLrc(text))
+        })
+        .catch(() => {
+          if (!cancelled) setLyricsError('Lyrics file is missing or unreadable.')
         })
     } else if (currentSong.lyricsFile) {
       window.api.library
@@ -275,6 +288,8 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
           <p className="performance-no-lyrics performance-error-text">{lyricsError}</p>
         ) : cdgData ? (
           <CdgLyricsView data={cdgData} audioRef={audioRef} />
+        ) : lrcLines ? (
+          <LrcLyricsView lines={lrcLines} audioRef={audioRef} />
         ) : lyricsText ? (
           <pre>{lyricsText}</pre>
         ) : (

@@ -5,8 +5,6 @@ so they don't get lost.
 
 ## Performance Mode
 
-- **Timed `.lrc` lyric sync** — highlight the current line automatically instead of manual scroll
-  only.
 - **Footswitch / MIDI control** — map a footswitch (likely USB-HID, acts as a keyboard) or a MIDI
   controller to the existing play/pause/next/prev/stop actions.
 - **Autoplay setting** — explicit opt-in to auto-advance to the next song when one ends (currently
