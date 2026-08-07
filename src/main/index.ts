@@ -5,6 +5,7 @@ import icon from '../../resources/icon.png?asset'
 import { registerDiagnosticsIpc } from './ipc/diagnostics'
 import { registerLibraryIpc } from './ipc/library'
 import { registerPerformanceIpc } from './ipc/performance'
+import { registerSettingsIpc } from './ipc/settings'
 import { registerSetlistsIpc } from './ipc/setlists'
 import { listSongs } from './lib/library'
 import { registerMediaProtocolHandler, registerMediaProtocolScheme } from './lib/mediaProtocol'
@@ -72,6 +73,7 @@ app.whenReady().then(() => {
   registerSetlistsIpc()
   registerPerformanceIpc(() => mainWindow)
   registerDiagnosticsIpc()
+  registerSettingsIpc()
   registerMediaProtocolHandler()
 
   // Read once up front so any corrupted file is detected before the renderer asks for warnings.

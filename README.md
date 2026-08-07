@@ -29,6 +29,7 @@ Everything lives under the OS user-data directory (`~/.config/gig-player` on Lin
   library.json           # song metadata index
   setlists.json          # setlists index
   performance-state.json # current setlist + song index while performing, for crash-safe resume
+  settings.json          # app-level preferences (e.g. autoplay)
   songs/
     <song-id>/
       audio.<ext>    # copied in on import — never references the original file path
@@ -108,6 +109,8 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
   requiring manual scroll
 - Playback fades out over the last few seconds before a song ends naturally; the emergency stop
   stays instant on purpose
+- Optional autoplay (off by default) auto-advances to the next song when one ends, toggled from
+  the header and persisted across restarts
 
 **Reliability hardening**:
 - Crash-safe resume — the current setlist + song index is persisted continuously while
@@ -123,8 +126,8 @@ up/down controls, remove. Double-click a song in a setlist to start performing f
 
 ## Not built yet
 
-See [TODO.md](TODO.md) for the backlog — footswitch/MIDI, an autoplay setting, a
-practice-oriented Rehearsal Mode (seek/loop/tempo/key changes), and library backup/export.
+See [TODO.md](TODO.md) for the backlog — footswitch/MIDI, a practice-oriented Rehearsal Mode
+(seek/loop/tempo/key changes), and library backup/export.
 
 ## License
 

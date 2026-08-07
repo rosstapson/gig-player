@@ -1,6 +1,7 @@
 import type { PerformanceState, Song } from '@shared/types'
 import { useEffect, useState } from 'react'
 import { useLibraryStore } from './state/libraryStore'
+import { useSettingsStore } from './state/settingsStore'
 import { useSetlistStore } from './state/setlistStore'
 import { LibraryView } from './views/Library/LibraryView'
 import { PerformanceView } from './views/Performance/PerformanceView'
@@ -18,13 +19,20 @@ function App(): React.JSX.Element {
 
   const { setlists, loaded: setlistsLoaded, load: loadSetlists } = useSetlistStore()
   const { loaded: libraryLoaded, load: loadLibrary } = useLibraryStore()
+  const {
+    settings,
+    loaded: settingsLoaded,
+    load: loadSettings,
+    set: setSettings
+  } = useSettingsStore()
 
   useEffect(() => {
     if (!setlistsLoaded) loadSetlists()
     if (!libraryLoaded) loadLibrary()
+    if (!settingsLoaded) loadSettings()
     window.api.performance.loadState().then(setResumeState)
     window.api.diagnostics.getStartupWarnings().then(setWarnings)
-  }, [setlistsLoaded, loadSetlists, libraryLoaded, loadLibrary])
+  }, [setlistsLoaded, loadSetlists, libraryLoaded, loadLibrary, settingsLoaded, loadSettings])
 
   const resumeSetlist = resumeState ? (setlists.find((s) => s.id === resumeState.setlistId) ?? null) : null
   const resumeIsValid =
@@ -62,6 +70,7 @@ function App(): React.JSX.Element {
           ? { setlistId: performance.setlistId }
           : { songs: performance.songs })}
         startIndex={performance.startIndex}
+        autoplay={settings.autoplay}
         onExit={() => setPerformance(null)}
       />
     )
@@ -82,6 +91,14 @@ function App(): React.JSX.Element {
             Setlists
           </button>
         </nav>
+        <label className="autoplay-toggle">
+          <input
+            type="checkbox"
+            checked={settings.autoplay}
+            onChange={(e) => setSettings({ autoplay: e.target.checked })}
+          />
+          Autoplay next song
+        </label>
       </header>
 
       {warnings.length > 0 && (

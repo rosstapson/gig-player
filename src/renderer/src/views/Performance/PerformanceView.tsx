@@ -11,6 +11,8 @@ type PerformanceSource = { setlistId: string } | { songs: Song[] }
 
 type PerformanceViewProps = PerformanceSource & {
   startIndex?: number
+  /** Auto-advance to the next song when one ends, instead of stopping and waiting. */
+  autoplay?: boolean
   onExit: () => void
 }
 
@@ -23,7 +25,7 @@ const ARM_TIMEOUT_MS = 1500
 const FADE_OUT_SECONDS = 3
 
 export function PerformanceView(props: PerformanceViewProps): React.JSX.Element {
-  const { startIndex = 0, onExit } = props
+  const { startIndex = 0, autoplay = false, onExit } = props
   const setlistId = 'setlistId' in props ? props.setlistId : null
   const ephemeralSongs = 'songs' in props ? props.songs : null
 
@@ -53,6 +55,9 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
   const audioRef = useRef<HTMLAudioElement>(null)
   const lyricsRef = useRef<HTMLDivElement>(null)
   const armTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Set just before an autoplay-triggered song change, so the load effect knows to start
+  // playback itself once the new src is ready, rather than waiting for a Space press.
+  const autoAdvanceRef = useRef(false)
 
   const currentSong = orderedSongs[currentIndex] ?? null
   const nextSong = orderedSongs[currentIndex + 1] ?? null
@@ -97,6 +102,10 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
       audioRef.current.src = toMediaUrl(currentSong.audioFile)
       audioRef.current.volume = currentSong.volume
       audioRef.current.load()
+      if (autoAdvanceRef.current) {
+        autoAdvanceRef.current = false
+        audioRef.current.play().catch((err) => setAudioError(err.message))
+      }
     }
 
     if (currentSong.lyricsFile && currentSong.lyricsFormat === 'cdg') {
@@ -323,6 +332,10 @@ export function PerformanceView(props: PerformanceViewProps): React.JSX.Element 
           // The fade-out below hits 0 right at the end — undo it so a replay of the
           // same song (no src reload, which is what normally restores volume) isn't silent.
           if (currentSong) e.currentTarget.volume = currentSong.volume
+          if (autoplay && nextSong) {
+            autoAdvanceRef.current = true
+            goTo(currentIndex + 1)
+          }
         }}
         onError={() => setAudioError('Audio file is missing or unreadable.')}
         onTimeUpdate={(e) => {

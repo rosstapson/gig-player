@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { IPC } from '@shared/channels'
 import type { ImportSongInput, SongPatch } from '@shared/ipc-contract'
-import type { PerformanceState } from '@shared/types'
+import type { PerformanceState, Settings } from '@shared/types'
 
 const api = {
   library: {
@@ -35,6 +35,10 @@ const api = {
   },
   diagnostics: {
     getStartupWarnings: () => ipcRenderer.invoke(IPC.diagnostics.getStartupWarnings)
+  },
+  settings: {
+    get: () => ipcRenderer.invoke(IPC.settings.get),
+    set: (patch: Partial<Settings>) => ipcRenderer.invoke(IPC.settings.set, patch)
   }
 }
 

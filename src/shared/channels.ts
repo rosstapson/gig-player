@@ -26,5 +26,9 @@ export const IPC = {
   },
   diagnostics: {
     getStartupWarnings: 'diagnostics:getStartupWarnings'
+  },
+  settings: {
+    get: 'settings:get',
+    set: 'settings:set'
   }
 } as const

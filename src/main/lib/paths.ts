@@ -17,6 +17,10 @@ export function getPerformanceStateFile(): string {
   return join(getDataDir(), 'performance-state.json')
 }
 
+export function getSettingsFile(): string {
+  return join(getDataDir(), 'settings.json')
+}
+
 export function getSongsDir(): string {
   return join(getDataDir(), 'songs')
 }

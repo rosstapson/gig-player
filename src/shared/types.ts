@@ -44,3 +44,8 @@ export interface PerformanceState {
   songIndex: number
   updatedAt: string
 }
+
+export interface Settings {
+  /** Explicit opt-in to auto-advance to the next song when one ends. Off by default. */
+  autoplay: boolean
+}

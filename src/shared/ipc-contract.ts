@@ -1,4 +1,4 @@
-import type { NewSong, PerformanceState, Setlist, Song } from './types'
+import type { NewSong, PerformanceState, Setlist, Settings, Song } from './types'
 
 /** Everything needed to import a song: metadata plus absolute source paths picked via native dialogs. */
 export interface ImportSongInput extends Omit<NewSong, 'audioFile' | 'lyricsFile'> {
@@ -51,5 +51,10 @@ export interface GigPlayerAPI {
   diagnostics: {
     /** Human-readable warnings about anything recovered from at startup (e.g. corrupted data files). */
     getStartupWarnings(): Promise<string[]>
+  }
+  settings: {
+    get(): Promise<Settings>
+    /** Merges the patch into the persisted settings and returns the full result. */
+    set(patch: Partial<Settings>): Promise<Settings>
   }
 }
